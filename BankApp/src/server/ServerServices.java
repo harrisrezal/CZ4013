@@ -120,7 +120,7 @@ public static Server server;
 
     }
     
-    public void processCloseAccount(RequestMessage reqReceived) {
+    public void processCloseAccount(RequestMessage reqReceived) throws IllegalAccessException {
     	
        	CloseAccountRequest req = (CloseAccountRequest) reqReceived.requestObj;
     	CloseAccountResponse resp = null;
@@ -137,6 +137,9 @@ public static Server server;
             this.broadcast(String.format("User %s deletes account with number %d", req.name, req.accountNumber));
             resp = new CloseAccountResponse(true, "");
         }
+        
+        this.server.sendToClient(new ResponseMessage(reqReceived.id,reqReceived.method,Status.OK, resp));
+
     }
 
     
