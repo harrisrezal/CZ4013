@@ -26,6 +26,9 @@ public class Server {
 	public static SocketAddress clientSocketAddr;
 	public static ByteBuffer messageByte =  ByteBuffer.allocate(8192) ;
 	
+	public static String clientIpAddress;
+	public static int clientPortNumber;
+	
 	public Server()
 	{
 		
@@ -33,7 +36,7 @@ public class Server {
 	public void openSocketConnection(DatagramSocket socket) throws SocketException
 	{
 		this.socket = socket;	
-        this.clientSocketAddr = new InetSocketAddress(Constants.CLIENT_IP, Constants.CLIENT_PORT);
+      //  this.clientSocketAddr = new InetSocketAddress(Constants.CLIENT_IP, Constants.CLIENT_PORT);
        
 	}
 	
@@ -50,7 +53,10 @@ public class Server {
         DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length);
         try {
 			this.socket.receive(packet);
-	        System.out.println(new String(packet.getData(), packet.getOffset(), packet.getLength()));
+						
+			System.out.println("Client Port  " + String.valueOf(packet.getPort()));
+			System.out.println(packet.getAddress().getHostAddress());
+		    this.clientSocketAddr = new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort());
 
 			RequestMessage reqReceived = UnMarshal.unMarshalRequest(messageByte);
 			messageByte.clear();
@@ -69,9 +75,11 @@ public class Server {
 
 	public void sendToClient(ResponseMessage resp) throws IllegalAccessException
 	{
+		//Need to create a new SocketAddress for each client request
+
         byte[] rawBuf = messageByte.array();
         Marshal.marshalResponse(resp, messageByte);
-        DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length,clientSocketAddr);
+        DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length,this.clientSocketAddr);
         try {
 			this.socket.send(packet);	
 			System.out.println("[Server] Send response to client");

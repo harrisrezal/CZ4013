@@ -36,11 +36,11 @@ public class Client  {
 	{
 		
 	}
-	public void openSocketConnection(DatagramSocket socket) throws SocketException
+	public void openSocketConnection(DatagramSocket socket,String serverIP, int serverPort) throws SocketException
 	{
 		this.socket = socket;	
         this.socket.setSoTimeout(Constants.TIMEOUT_MILLISECONDS);
-        this.serverSocketAddr = new InetSocketAddress(Constants.SERVER_IP, Constants.SERVER_PORT);
+        this.serverSocketAddr = new InetSocketAddress(serverIP, serverPort);
 	}
 	
 	public void setSocketTimeOut(int milliSeconds)  throws SocketException

@@ -6,15 +6,21 @@ import java.net.SocketException;
 import java.util.Scanner;
 
 import utils.Constants;
+import utils.ReadInputs;
 
 public class Main {
 
 
 	public static void main(String[] args) throws SocketException {
-		
-		
+        Scanner scan = new Scanner(System.in);
 
-        String menu = "----------------------------------------------------------------\n" +
+		String welcome = "Welcome To SCSE Bank\n"
+				+ "Please enter credentials of the server\n";
+		System.out.println(welcome);
+		String serverIP = askIpAddress();
+		int serverPort = askPortNumber();
+		
+        String menu = "----------------------------Bank Menu------------------------------------\n" +
                 "Please choose a service by typing [1-8]:\n" +
                 "1: Open a new bank account\n" +
                 "2: Query information from a bank account\n" +
@@ -29,13 +35,12 @@ public class Main {
 
        ClientServices clientService = new ClientServices(new Client());
        DatagramSocket socket = new DatagramSocket(new InetSocketAddress(Constants.CLIENT_IP, Constants.CLIENT_PORT));
-       clientService.client.openSocketConnection(socket);
+       clientService.client.openSocketConnection(socket,serverIP,serverPort);
        
       
 
         System.out.print(menu);
         boolean endProgramme = false;
-        Scanner scan = new Scanner(System.in);
         
         while (!endProgramme) {
         System.out.print("Enter any number: ");
@@ -47,6 +52,7 @@ public class Main {
                 	clientService.openBankAccount();
                     break;
                 case 2:
+                	//Idempotent Request
                 	clientService.runQueryService();
                     break;
                 case 3:
@@ -59,6 +65,7 @@ public class Main {
                 	clientService.runMonitorService(Constants.CLIENT_IP, Constants.CLIENT_PORT);
                     break;
                 case 6:
+                	//Non-Idempotent Request
                 	clientService.runMaintenanceService();
                     break;
                 case 7:
@@ -77,7 +84,23 @@ public class Main {
         } catch (Exception e) {
             System.out.println("No response received.");
         } 
+        
+        
+        
         }
+        
+        
 	}
+	
+	
+    private static String askIpAddress() {
+        System.out.print("Enter Server's IP Address :  ");
+        return ReadInputs.readLine();
+    }
+    
+    private static int askPortNumber() {
+        System.out.print("Enter Server's Port Number ");
+        return ReadInputs.safeReadInt();
+    }
 
 }
