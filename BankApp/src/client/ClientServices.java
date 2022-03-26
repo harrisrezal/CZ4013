@@ -45,14 +45,18 @@ public class ClientServices {
            String password = this.askPassword();
            Currency currency = this.askCurrency();
            Double balance = this.askAmount();
-           client.writeToServer("OpenAccount", new OpenAccountRequest(name,password,currency,balance));
-           ResponseMessage resp = client.receieveFromServer();
-           OpenAccountResponse openResp = (OpenAccountResponse) resp.obj;
-         
-           System.out.println("\n[Client] Thank you for opening up an account with us");          
-           System.out.println("************************************************************");
-           System.out.println("[Client] Your account number is : " + String.valueOf(openResp.accountNumber));
-           System.out.println("************************************************************");
+           
+           ResponseMessage resp = client.sendRequest("OpenAccount", new OpenAccountRequest(name,password,currency,balance));           
+           if(resp != null)
+           {
+               OpenAccountResponse openResp = (OpenAccountResponse) resp.obj;
+               
+               System.out.println("\n[Client] Thank you for opening up an account with us");          
+               System.out.println("************************************************************");
+               System.out.println("[Client] Your account number is : " + String.valueOf(openResp.accountNumber));
+               System.out.println("************************************************************");
+           }
+
 
     }
     
@@ -60,8 +64,12 @@ public class ClientServices {
         System.out.println("Please input the following information to query from an account");
         int accountNumber = this.askAccountNumber();
         String password = this.askPassword();
-        client.writeToServer("QueryAccount", new QueryAccountRequest(accountNumber,password));
-        ResponseMessage resp = client.receieveFromServer();
+   
+        ResponseMessage resp = client.sendRequest("QueryAccount", new QueryAccountRequest(accountNumber,password));
+
+        	     
+       if(resp != null)
+              {
         QueryAccountResponse queryResp = (QueryAccountResponse) resp.obj;
         
         if(queryResp.success)
@@ -81,6 +89,7 @@ public class ClientServices {
             System.out.println("[Client] : " + queryResp.errorMessage);
             System.out.println("************************************************************");
         }
+        }
     }
 
     
@@ -91,8 +100,11 @@ public class ClientServices {
         String password = this.askPassword();
         Currency currency = this.askCurrency();
         Double amount = this.askAmount();
-        client.writeToServer("DepositAccount", new DepositAccountRequest(name,accountNumber,password,currency,-amount));
-        ResponseMessage resp = client.receieveFromServer();
+        
+        
+        ResponseMessage resp = client.sendRequest("DepositAccount", new DepositAccountRequest(name,accountNumber,password,currency,-amount));
+        		 if(resp != null)
+                 {    
         DepositAccountResponse DepositResp = (DepositAccountResponse) resp.obj;
         
         if(DepositResp.success)
@@ -113,6 +125,7 @@ public class ClientServices {
             System.out.println("[Client] : " + DepositResp.errorMessage);
             System.out.println("************************************************************");
         }
+                 }
 
     }
     
@@ -120,8 +133,11 @@ public class ClientServices {
     public void runMonitorService(String ipAddress, int port) throws IllegalAccessException {
         System.out.print("Monitor interval (s) = ");
         int interval = ReadInputs.safeReadInt();
-        client.writeToServer("MonitorAccount", new MonitorAccountRequest(ipAddress,port,interval));
-        ResponseMessage resp = client.receieveFromServer();
+        
+        ResponseMessage resp = client.sendRequest("MonitorAccount", new MonitorAccountRequest(ipAddress,port,interval));
+
+        if(resp != null)
+        {  
         MonitorAccountStatusResponse StatusResp = (MonitorAccountStatusResponse) resp.obj;
 
         if(StatusResp.success)
@@ -136,7 +152,7 @@ public class ClientServices {
         {
           System.out.println("Failed to request to monitor");
         }
-        
+        }
     }
     
     public void runMaintenanceService() throws IllegalAccessException {
@@ -144,8 +160,10 @@ public class ClientServices {
         int accountNumber = this.askAccountNumber();
         String name = this.askName();
         String password = this.askPassword();
-        client.writeToServer("PayMaintenanceFee", new MaintenanceFeeAccountRequest(accountNumber,name,password));
-        ResponseMessage resp = client.receieveFromServer();
+       
+        ResponseMessage resp = client.sendRequest("PayMaintenanceFee", new MaintenanceFeeAccountRequest(accountNumber,name,password));
+        if(resp != null)
+        {
         MaintenanceFeeAccountResponse feeResp = (MaintenanceFeeAccountResponse) resp.obj;
         if (feeResp.success) {
             System.out.println("************************************************************");
@@ -157,6 +175,7 @@ public class ClientServices {
             System.out.println("************************************************************");
 
         }
+        }
 
     }
 
@@ -166,8 +185,11 @@ public class ClientServices {
         int accountNumber = this.askAccountNumber();
         String name = this.askName();
         String password = this.askPassword();
-        client.writeToServer("CloseAccount", new CloseAccountRequest(name,accountNumber,password));
-        ResponseMessage resp = client.receieveFromServer();
+        
+        ResponseMessage resp = client.sendRequest("CloseAccount", new CloseAccountRequest(name,accountNumber,password));
+
+        if(resp != null)
+        {
         CloseAccountResponse closeResp = (CloseAccountResponse) resp.obj;
         if (closeResp.success) {
             System.out.println("************************************************************");
@@ -178,6 +200,7 @@ public class ClientServices {
             System.out.printf("Failed to close bank account with reason: %s\n", closeResp.errorMessage);
             System.out.println("************************************************************");
 
+        }
         }
 
     }

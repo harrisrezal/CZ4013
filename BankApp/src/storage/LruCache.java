@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import request.RequestMessage;
+import response.ResponseMessage;
+
 import java.util.Map.Entry;
 
 public class LruCache<K, V> {
@@ -18,11 +22,13 @@ public class LruCache<K, V> {
         });
     }
 
-    public Optional<V> get(K key) {
-        return Optional.ofNullable(this.map.get(key));
+    public ResponseMessage get(K key) {
+    	System.out.println("Get from Cache");
+    	return (ResponseMessage) this.map.get(key);
     }
 
     public void put(K key, V value) {
+    	System.out.println("Put inside Cache");
         this.map.put(key, value);
     }
 }

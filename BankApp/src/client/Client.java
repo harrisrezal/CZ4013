@@ -49,21 +49,77 @@ public class Client  {
 	}
 
 	
-	public void writeToServer(String method, Object obj) throws IllegalAccessException 
+	
+	
+public ResponseMessage sendRequest(String method, Object obj)
+{
+	
+       UUID id = UUID.randomUUID();
+       ResponseMessage resp = null;
+       boolean receive = false;
+	   for(int triesLeft = Constants.MAX_ATTEMPT; triesLeft > 0; --triesLeft)
+       {
+		
+	    try {
+			this.writeToServer(id,method,obj);
+						
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			receive = false;
+		}
+	    
+	    try {
+			resp = receieveFromServer();
+			receive = true;
+	    }catch(Exception e) {
+			System.out.println("[Client] Did not receive from Server after timeout..");
+			System.out.println("[Client] Re-sending requests");
+			if(triesLeft == 1)
+			{
+				
+				System.out.println("[Client] No Connection after multiple attempts" );
+
+			}
+			else 
+			{
+				System.out.println("[Client] Re-sending requests");
+
+			}
+			receive = false;
+	      }
+	    
+	    if(receive)
+	    {
+			System.out.println("[Client] true");
+	    	break;
+	    }
+	    
+       }
+	   
+	   return resp;
+       
+	
+	
+}
+	
+	
+	
+	public void writeToServer(UUID id, String method, Object obj) throws IllegalAccessException 
 	{
-        UUID id = UUID.randomUUID();
 		System.out.println("[Client] The request ID is : " + id.toString() );
 		System.out.println("[Client] The request Method is : " + method );
-
         Marshal.marshal(obj, messageByte, id, method);
         byte[] rawBuf = messageByte.array();
-	    try {
-			this.socket.send(new DatagramPacket(rawBuf, rawBuf.length, serverSocketAddr));
-		} catch (IOException e) {
-			System.out.println("[Client] Did not manage to Write to Server");
-			e.printStackTrace();
-		}
-	    messageByte.clear();//Clear Buffer after Done.
+	    
+  
+            try {
+    			this.socket.send(new DatagramPacket(rawBuf, rawBuf.length, serverSocketAddr));
+    		} catch (IOException e) {
+    			System.out.println("[Client] Did not manage to Write to Server");
+    			e.printStackTrace();
+    		}
+    	    messageByte.clear();//Clear Buffer after Done.
+	    
 	}
 	
 	public ResponseMessage receieveFromServer()
