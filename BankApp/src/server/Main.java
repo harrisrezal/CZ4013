@@ -1,8 +1,10 @@
 package server;
 
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 import client.Client;
@@ -15,11 +17,13 @@ import utils.Constants;
 public class Main  {
 
 	
-	public static void main(String[] args) throws SocketException, IllegalAccessException {
+	public static void main(String[] args) throws SocketException, IllegalAccessException, UnknownHostException {
 
     boolean atMostOnce = true; //True for atMostonce, false for at least once.
 	ServerServices serverService = new ServerServices(new Server());
-    DatagramSocket socket = new DatagramSocket(new InetSocketAddress(Constants.SERVER_IP, Constants.SERVER_PORT));
+	System.out.println(InetAddress.getByName(Constants.SERVER_IP));
+    DatagramSocket socket = new DatagramSocket(null);
+    socket.bind(new InetSocketAddress(InetAddress.getByName(Constants.SERVER_IP), Constants.SERVER_PORT));
     serverService.server.openSocketConnection(socket, new LruCache<UUID, ResponseMessage>(atMostOnce ? 1024 : 0),atMostOnce);
     System.out.printf("[Server] listening on port ://%s:%d\n", Constants.SERVER_IP,  Constants.SERVER_PORT);
     while(true) {
@@ -38,7 +42,7 @@ public class Main  {
         		serverService.processDeposit(reqReceived);
         		break;
         	case "MonitorAccount":
-        		serverService.processDeposit(reqReceived);
+        		serverService.processMonitor(reqReceived);
         		break;
         	case "PayMaintenanceFee":
         		serverService.processPayMaintenanceFee(reqReceived);

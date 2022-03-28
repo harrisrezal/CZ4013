@@ -38,7 +38,7 @@ public class Server {
 	public static DatagramSocket socket;
 	public static SocketAddress clientSocketAddr;
 	public static ByteBuffer messageByte =  ByteBuffer.allocate(8192) ;
-	public static double packetLossRate = 0.1;
+	public static double packetLossRate = 0.9;
 	public static String clientIpAddress;
 	public static int clientPortNumber;
     private LruCache<UUID, ResponseMessage> cache;

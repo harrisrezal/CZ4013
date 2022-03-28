@@ -17,8 +17,10 @@ public class Main {
 		String welcome = "Welcome To SCSE Bank\n"
 				+ "Please enter credentials of the server\n";
 		System.out.println(welcome);
-		String serverIP = askIpAddress();
-		int serverPort = askPortNumber();
+		String serverIP = Constants.CLIENT_IP;
+		int serverPort = Constants.SERVER_PORT; 
+//		String serverIP = askIpAddress();
+//		int serverPort = askPortNumber();
 		
         String menu = "----------------------------Bank Menu------------------------------------\n" +
                 "Please choose a service by typing [1-8]:\n" +
