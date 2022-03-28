@@ -145,6 +145,12 @@ public ResponseMessage sendRequest(String method, Object obj)
 		   byte[] rawBuf = messageByte.array();
 	        DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length);
 	        Instant end = Instant.now().plus(interval);
+	        try {
+				this.setSocketTimeOut(0);
+			} catch (SocketException e1) {
+				System.out.println("[Client] Error Setting the socketTime out.");
+				e1.printStackTrace();
+			}
 	        Thread pollingThread = new Thread(() -> {
 	            while(!Instant.now().isAfter(end)) {
 	                try {
@@ -187,5 +193,12 @@ public ResponseMessage sendRequest(String method, Object obj)
 	        }
 
 	        pollingThread.interrupt();
+	        try {
+				this.setSocketTimeOut(Constants.TIMEOUT_MILLISECONDS);
+			} catch (SocketException e) {
+				System.out.println("[Client] Error Setting back the socketTime out.");
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	    }
 }

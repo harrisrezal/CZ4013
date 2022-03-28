@@ -41,11 +41,11 @@ public class Main {
        
       
 
-        System.out.print(menu);
         boolean endProgramme = false;
         
         while (!endProgramme) {
-        System.out.print("Enter any number: ");
+        System.out.print(menu);
+        System.out.print("Enter menu option: ");
         int num = scan.nextInt();
         
         try {
@@ -96,12 +96,12 @@ public class Main {
 	
 	
     private static String askIpAddress() {
-        System.out.print("Enter Server's IP Address :  ");
+        System.out.print("Enter Server's IP Address : ");
         return ReadInputs.readLine();
     }
     
     private static int askPortNumber() {
-        System.out.print("Enter Server's Port Number ");
+        System.out.print("Enter Server's Port Number : ");
         return ReadInputs.safeReadInt();
     }
 
