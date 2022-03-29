@@ -25,16 +25,6 @@ import utils.Constants;
  * */
 public class Server {
 	
-	
-	/*
-	 * 
-	 * TODO
-	 * 1) Store History of Message 
-	 * 2) Filter DUplicate Message
-	 * 
-	 * 
-	 * */
-	
 	public static DatagramSocket socket;
 	public static SocketAddress clientSocketAddr;
 	public static ByteBuffer messageByte =  ByteBuffer.allocate(8192) ;
@@ -152,7 +142,7 @@ if(atMostOnce)
 		//Need to create a new SocketAddress for each client request
 		
 		Double random = Math.random();
-		System.out.println("Send Random Value : " + String.valueOf(random));
+		System.out.println("[Server] Math Random Value is : " + String.valueOf(random));
    
     	 byte[] rawBuf = messageByte.array();
          Marshal.marshalResponse(resp, messageByte);
@@ -162,7 +152,7 @@ if(atMostOnce)
          {
          try {
  			this.socket.send(packet);	
- 			System.out.println("[Server] Send response to client");
+ 			System.out.println("[Server] Successfully send response to client");
  			messageByte.clear();
  			
  		} catch (IOException e) {
@@ -187,7 +177,7 @@ if(atMostOnce)
         DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length,clientRegisteredAddress);
         try {
 			this.socket.send(packet);	
-			System.out.println("[Server] Send response to Registered client");
+			System.out.println("[Server] Successfully send response to Registered client");
 			messageByte.clear();
 			
 		} catch (IOException e) {

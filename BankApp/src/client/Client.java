@@ -20,6 +20,8 @@ import java.util.UUID;
 
 import communication.Marshal;
 import communication.UnMarshal;
+import response.MaintenanceFeeAccountResponse;
+import response.MonitorAccountResponse;
 import response.ResponseMessage;
 
 import utils.Constants;
@@ -155,9 +157,12 @@ public ResponseMessage sendRequest(String method, Object obj)
 	            while(!Instant.now().isAfter(end)) {
 	                try {
 	                    this.socket.receive(packet);
+	    				System.out.println("[Client] Recieve from Server Broadcast");
 
 	                    try {
 	                        ResponseMessage resp = UnMarshal.unMarshalResponse(messageByte);
+	                        MonitorAccountResponse monitorResp = (MonitorAccountResponse) resp.obj;
+	                        System.out.println("[Client] Broadcast Receive : " + monitorResp.info);
 	                    } catch (Throwable var8) {
 	                        if (messageByte != null) {
 	                            try {
