@@ -1,8 +1,8 @@
 package storage;
 
 
-
 import utils.Currency;
+
 /**
  * Details about a bank account stored in DB.
  */

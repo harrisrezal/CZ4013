@@ -3,7 +3,7 @@ package response;
 import utils.Currency;
 
 public class MaintenanceFeeAccountResponse {
-	
+
     public Currency currency;
     public double balance;
     public boolean success;

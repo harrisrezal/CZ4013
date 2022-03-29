@@ -1,98 +1,81 @@
 package client;
 
-/* 
+/*
  * Client Services
- * 
- * 
+ *
+ *
  * */
 
-import java.time.Duration;
-import java.util.Optional;
-
-import request.CloseAccountRequest;
-import request.DepositAccountRequest;
-import request.MaintenanceFeeAccountRequest;
-import request.MonitorAccountRequest;
-import request.OpenAccountRequest;
-import request.QueryAccountRequest;
-import response.CloseAccountResponse;
-import response.DepositAccountResponse;
-import response.MaintenanceFeeAccountResponse;
-import response.MonitorAccountStatusResponse;
-import response.OpenAccountResponse;
-import response.QueryAccountResponse;
-import response.ResponseMessage;
+import request.*;
+import response.*;
 import utils.Constants;
 import utils.Currency;
 import utils.ReadInputs;
 
- 
+import java.time.Duration;
+import java.util.Optional;
+
+
 public class ClientServices {
 
-    
+
     public static Client client;
-    
-    public ClientServices(Client client)
-    {
-    	this.client =  client;
+
+    public ClientServices(Client client) {
+        ClientServices.client = client;
     }
-    
-    
-    public void openBankAccount() throws IllegalAccessException
-    {
-    	   System.out.println("Please input the following information to open an account");
-           String name = this.askName();
-           String password = this.askPassword();
-           Currency currency = this.askCurrency();
-           Double balance = this.askAmount();
-           
-           ResponseMessage resp = client.sendRequest("OpenAccount", new OpenAccountRequest(name,password,currency,balance));           
-           if(resp != null)
-           {
-               OpenAccountResponse openResp = (OpenAccountResponse) resp.obj;
-               
-               System.out.println("\n[Client] Thank you for opening up an account with us");          
-               System.out.println("************************************************************");
-               System.out.println("[Client] Your account number is : " + String.valueOf(openResp.accountNumber));
-               System.out.println("************************************************************");
-           }
+
+
+    public void openBankAccount() throws IllegalAccessException {
+        System.out.println("Please input the following information to open an account");
+        String name = this.askName();
+        String password = this.askPassword();
+        Currency currency = this.askCurrency();
+        Double balance = this.askAmount();
+
+        ResponseMessage resp = client.sendRequest("OpenAccount", new OpenAccountRequest(name, password, currency, balance));
+        if (resp != null) {
+            OpenAccountResponse openResp = (OpenAccountResponse) resp.obj;
+
+            System.out.println("\n[Client] Thank you for opening up an account with us");
+            System.out.println("************************************************************");
+            System.out.println("[Client] Your account number is : " + openResp.accountNumber);
+            System.out.println("************************************************************");
+        }
 
 
     }
-    
+
     public void runQueryService() throws IllegalAccessException {
         System.out.println("Please input the following information to query from an account");
         int accountNumber = this.askAccountNumber();
         String password = this.askPassword();
-   
-        ResponseMessage resp = client.sendRequest("QueryAccount", new QueryAccountRequest(accountNumber,password));
 
-        	     
-       if(resp != null)
-              {
-        QueryAccountResponse queryResp = (QueryAccountResponse) resp.obj;
-        
-        if(queryResp.success)
-        {
-            System.out.println("\n[Client] Account detail as requested");
-            System.out.println("************************************************************");
-            System.out.println("[Client] Account is under     : " + queryResp.name);
-            System.out.println("[Client] Account currency is  : " + queryResp.currency.toString());
-            System.out.println("[Client] Account balance is   : " + String.valueOf(queryResp.balance));
-            System.out.println("************************************************************");
+        ResponseMessage resp = client.sendRequest("QueryAccount", new QueryAccountRequest(accountNumber, password));
 
-        }
-        else {
-        	
-            System.out.println("\n[Client] Error retrieving your account due to the following reason ");
-            System.out.println("************************************************************");
-            System.out.println("[Client] : " + queryResp.errorMessage);
-            System.out.println("************************************************************");
-        }
+
+        if (resp != null) {
+            QueryAccountResponse queryResp = (QueryAccountResponse) resp.obj;
+
+            if (queryResp.success) {
+                System.out.println("\n[Client] Account detail as requested");
+                System.out.println("************************************************************");
+                System.out.println("[Client] Account is under     : " + queryResp.name);
+                System.out.println("[Client] Account currency is  : " + queryResp.currency.toString());
+                System.out.println("[Client] Account balance is   : " + queryResp.balance);
+                System.out.println("************************************************************");
+
+            } else {
+
+                System.out.println("\n[Client] Error retrieving your account due to the following reason ");
+                System.out.println("************************************************************");
+                System.out.println("[Client] : " + queryResp.errorMessage);
+                System.out.println("************************************************************");
+            }
         }
     }
 
-    
+
     public void runDepositService(String transaction) throws IllegalAccessException {
         System.out.println("Please input the following information to perform a " + transaction);
         int accountNumber = this.askAccountNumber();
@@ -100,111 +83,103 @@ public class ClientServices {
         String password = this.askPassword();
         Currency currency = this.askCurrency();
         Double amount = this.askAmount();
-        
-        
-        ResponseMessage resp = client.sendRequest("DepositAccount", new DepositAccountRequest(name,accountNumber,password,currency,-amount));
-        		 if(resp != null)
-                 {    
-        DepositAccountResponse DepositResp = (DepositAccountResponse) resp.obj;
-        
-        if(DepositResp.success)
-        {
-            System.out.println("\n[Client] Transaction Successful. Detailed as followed: ");
-            System.out.println("************************************************************");
-            System.out.println("[Client] Account is under     : " + DepositResp.name);
-            System.out.println("[Client] Account currency is  : " + DepositResp.currency.toString());
-            System.out.printf("[Client] Amount to %s is : %s", transaction, String.valueOf(DepositResp.amount));
-            System.out.println("\n[Client] Account new balance is   : " + String.valueOf(DepositResp.balance));
-            System.out.println("************************************************************");
 
+
+        ResponseMessage resp = client.sendRequest("DepositAccount", new DepositAccountRequest(name, accountNumber, password, currency, -amount));
+        if (resp != null) {
+            DepositAccountResponse DepositResp = (DepositAccountResponse) resp.obj;
+
+            if (DepositResp.success) {
+                System.out.println("\n[Client] Transaction Successful. Detailed as followed: ");
+                System.out.println("************************************************************");
+                System.out.println("[Client] Account is under     : " + DepositResp.name);
+                System.out.println("[Client] Account currency is  : " + DepositResp.currency.toString());
+                System.out.printf("[Client] Amount to %s is : %s", transaction, DepositResp.amount);
+                System.out.println("\n[Client] Account new balance is   : " + DepositResp.balance);
+                System.out.println("************************************************************");
+
+            } else {
+
+                System.out.println("\n[Client] Error retrieving completing your deposit transaction due to the following reason ");
+                System.out.println("************************************************************");
+                System.out.println("[Client] : " + DepositResp.errorMessage);
+                System.out.println("************************************************************");
+            }
         }
-        else {
-        	
-            System.out.println("\n[Client] Error retrieving completing your deposit transaction due to the following reason ");
-            System.out.println("************************************************************");
-            System.out.println("[Client] : " + DepositResp.errorMessage);
-            System.out.println("************************************************************");
-        }
-                 }
 
     }
-    
-    
+
+
     public void runMonitorService(String ipAddress, int port) throws IllegalAccessException {
         System.out.print("Monitor interval (s) = ");
         int interval = ReadInputs.safeReadInt();
-        
-        ResponseMessage resp = client.sendRequest("MonitorAccount", new MonitorAccountRequest(ipAddress,port,interval));
 
-        if(resp != null)
-        {  
-        MonitorAccountStatusResponse StatusResp = (MonitorAccountStatusResponse) resp.obj;
+        ResponseMessage resp = client.sendRequest("MonitorAccount", new MonitorAccountRequest(ipAddress, port, interval));
 
-        if(StatusResp.success)
-        {
-            System.out.println("[Client] Successfully requested to monitor, waiting for updates...");
-            System.out.println("************************************************************");
-        	client.poll(Duration.ofSeconds((long)interval));	
-            System.out.println("************************************************************");
-            System.out.println("[Client] Finished monitoring.");
+        if (resp != null) {
+            MonitorAccountStatusResponse StatusResp = (MonitorAccountStatusResponse) resp.obj;
 
-        }else
-        {
-          System.out.println("Failed to request to monitor");
-        }
+            if (StatusResp.success) {
+                System.out.println("[Client] Successfully requested to monitor, waiting for updates...");
+                System.out.println("************************************************************");
+                client.poll(Duration.ofSeconds(interval));
+                System.out.println("************************************************************");
+                System.out.println("[Client] Finished monitoring.");
+
+            } else {
+                System.out.println("Failed to request to monitor");
+            }
         }
     }
-    
+
     public void runMaintenanceService() throws IllegalAccessException {
         System.out.println("Please input the following information to pay the maintenance fee");
         int accountNumber = this.askAccountNumber();
         String name = this.askName();
         String password = this.askPassword();
-       
-        ResponseMessage resp = client.sendRequest("PayMaintenanceFee", new MaintenanceFeeAccountRequest(accountNumber,name,password));
-        if(resp != null)
-        {
-        MaintenanceFeeAccountResponse feeResp = (MaintenanceFeeAccountResponse) resp.obj;
-        if (feeResp.success) {
-            System.out.println("************************************************************");
-            System.out.printf("[Client] Successfully pay maintenance fee, new balance = %f %s\n", feeResp.balance, feeResp.currency);
-            System.out.println("************************************************************");
-        } else {
-            System.out.println("************************************************************");
-            System.out.printf("[Client]Failed to pay maintenance fee with reason: %s\n", feeResp.errorMessage);
-            System.out.println("************************************************************");
 
-        }
+        ResponseMessage resp = client.sendRequest("PayMaintenanceFee", new MaintenanceFeeAccountRequest(accountNumber, name, password));
+        if (resp != null) {
+            MaintenanceFeeAccountResponse feeResp = (MaintenanceFeeAccountResponse) resp.obj;
+            if (feeResp.success) {
+                System.out.println("************************************************************");
+                System.out.printf("[Client] Successfully pay maintenance fee, new balance = %f %s\n", feeResp.balance, feeResp.currency);
+                System.out.println("************************************************************");
+            } else {
+                System.out.println("************************************************************");
+                System.out.printf("[Client]Failed to pay maintenance fee with reason: %s\n", feeResp.errorMessage);
+                System.out.println("************************************************************");
+
+            }
         }
 
     }
 
-    
+
     public void runCloseAccountService() throws IllegalAccessException {
         System.out.println("Please input the following information to close an account");
         int accountNumber = this.askAccountNumber();
         String name = this.askName();
         String password = this.askPassword();
-        
-        ResponseMessage resp = client.sendRequest("CloseAccount", new CloseAccountRequest(name,accountNumber,password));
 
-        if(resp != null)
-        {
-        CloseAccountResponse closeResp = (CloseAccountResponse) resp.obj;
-        if (closeResp.success) {
-            System.out.println("************************************************************");
-            System.out.printf("Successfully closed bank account with number = %d\n", accountNumber);
-            System.out.println("************************************************************");
-        } else {
-            System.out.println("************************************************************");
-            System.out.printf("Failed to close bank account with reason: %s\n", closeResp.errorMessage);
-            System.out.println("************************************************************");
+        ResponseMessage resp = client.sendRequest("CloseAccount", new CloseAccountRequest(name, accountNumber, password));
 
-        }
+        if (resp != null) {
+            CloseAccountResponse closeResp = (CloseAccountResponse) resp.obj;
+            if (closeResp.success) {
+                System.out.println("************************************************************");
+                System.out.printf("Successfully closed bank account with number = %d\n", accountNumber);
+                System.out.println("************************************************************");
+            } else {
+                System.out.println("************************************************************");
+                System.out.printf("Failed to close bank account with reason: %s\n", closeResp.errorMessage);
+                System.out.println("************************************************************");
+
+            }
         }
 
     }
-    
+
     private String askName() {
         System.out.print("Your name = ");
         return ReadInputs.readLine();
@@ -229,11 +204,12 @@ public class ClientServices {
     private Currency askCurrency() {
         System.out.printf("Your currency choice (%s) = ", Currency.getAllCurrenciesString());
         String currency = ReadInputs.readLine().toUpperCase();
-        Optional<Currency> currencyOpt = Currency.getAllCurrencies().filter((x) -> {
+        Optional<Currency> currencyOpt = Currency.getAllCurrencies().filter((x) ->
+        {
             return x.toString().equals(currency);
         }).findFirst();
         if (currencyOpt.isPresent()) {
-            return (Currency)currencyOpt.get();
+            return currencyOpt.get();
         } else {
             System.out.println("Invalid currency code!");
             return this.askCurrency();
@@ -250,5 +226,5 @@ public class ClientServices {
             return amount;
         }
     }
-    
+
 }

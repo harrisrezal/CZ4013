@@ -24,13 +24,16 @@ import utils.Constants;
  * Body 
  * */
 public class Server {
-	
-	public static DatagramSocket socket;
-	public static SocketAddress clientSocketAddr;
-	public static ByteBuffer messageByte =  ByteBuffer.allocate(8192) ;
-	public static double packetLossRate = 0.9;
-	public static String clientIpAddress;
-	public static int clientPortNumber;
+
+    // environment variables
+    public static Map<String, String> env = System.getenv();
+
+    public static DatagramSocket socket;
+    public static SocketAddress clientSocketAddr;
+    public static ByteBuffer messageByte = ByteBuffer.allocate(8192);
+    public static double packetLossRate = Double.parseDouble(env.getOrDefault("PACKET_LOSS_RATE", "0.0"));
+    public static String clientIpAddress;
+    public static int clientPortNumber;
     private LruCache<UUID, ResponseMessage> cache;
     public static boolean atMostOnce;
 
@@ -52,141 +55,125 @@ public class Server {
         this.socket.setSoTimeout(milliSeconds);
 	}
 
-	
-	public RequestMessage receieveFromClient()
-	{
+
+    public RequestMessage receieveFromClient() {
         byte[] rawBuf = messageByte.array();
 
         DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length);
         try {
-			this.socket.receive(packet);
-						
-			System.out.println("Client Port  : " + String.valueOf(packet.getPort()));
-			System.out.println("Client Ip Address : " + packet.getAddress().getHostAddress());
-	        System.out.println(new String(packet.getData(), packet.getOffset(), packet.getLength()));
-		    this.clientSocketAddr = new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort());
+            socket.receive(packet);
+
+            if (Math.random() >= packetLossRate) {
+                System.out.println("Dropping Clients request packet on PURPOSE!!");
+                return null;
+            }
+
+            System.out.println("Client Port  " + packet.getPort());
+            System.out.println(packet.getAddress().getHostAddress());
+            System.out.println(new String(packet.getData(), packet.getOffset(), packet.getLength()));
+            clientSocketAddr = new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort());
 
 			RequestMessage reqReceived = UnMarshal.unMarshalRequest(messageByte);
 
 			messageByte.clear();
 
-if(atMostOnce)
-{
-	ResponseMessage fromCache = this.cache.get(reqReceived.id);
-	if(fromCache != null)
-	{
-		System.out.println("[Server] Got Duplicated Request");
-		this.ReSendToClient(fromCache);
-		return null;
-	}
-	else
-	{		
-		System.out.println("[Server] New  Request");
-		return reqReceived;
-	}
-}else
-{
-	System.out.println("[Server] At Least Once Request");
-	return reqReceived;
-}
-		
-			
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+            if (atMostOnce) {
+                ResponseMessage fromCache = this.cache.get(reqReceived.id);
+                if (fromCache != null) {
+                    System.out.println("[Server] Got Duplicated Request");
+                    this.ReSendToClient(fromCache);
+                    return null;
+                } else {
+                    System.out.println("[Server] New  Request");
+                    return reqReceived;
+                }
+            } else {
+                System.out.println("[Server] At Least Once Request");
+                return reqReceived;
+            }
 
 
-	}
-	
-	public void ReSendToClient(ResponseMessage resp) throws IllegalAccessException
-	{
-		//Need to create a new SocketAddress for each client request
-		Double random = Math.random();
-		System.out.println("Resend Random Value : " + String.valueOf(random));
-		 if(random < this.packetLossRate)
-	     {
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+
+
+    }
+
+    public void ReSendToClient(ResponseMessage resp) throws IllegalAccessException {
+        //Need to create a new SocketAddress for each client request
+        Double random = Math.random();
+        System.out.println("Resend Random Value : " + random);
+        if (random < packetLossRate) {
+            byte[] rawBuf = messageByte.array();
+            Marshal.marshalResponse(resp, messageByte);
+            DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length, clientSocketAddr);
+            try {
+                socket.send(packet);
+                System.out.println("[Server] ReSending Reponse to client");
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("[SERVER] Drop ReResponse to Client");
+        }
+
+        messageByte.clear();
+
+    }
+
+
+    public void sendToClient(ResponseMessage resp) throws IllegalAccessException {
+        //Need to create a new SocketAddress for each client request
+
+        Double random = Math.random();
+        System.out.println("[Server] Math Random Value is : " + random);
+
         byte[] rawBuf = messageByte.array();
         Marshal.marshalResponse(resp, messageByte);
-        DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length,this.clientSocketAddr);
-        try {
-			this.socket.send(packet);	
-			System.out.println("[Server] ReSending Reponse to client");
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	     }
-		   else
-		     {
-		    	 System.out.println("[SERVER] Drop ReResponse to Client");
-		     }
-		 
-			messageByte.clear();
+        DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length, clientSocketAddr);
+        this.cache.put(resp.id, resp);
+        if (random < packetLossRate) {
+            try {
+                socket.send(packet);
+                System.out.println("[Server] Successfully send response to client");
+                messageByte.clear();
 
-		       
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("[SERVER] Drop Response to Client");
+        }
 
-	}
-	
-	
-	
-
-	public void sendToClient(ResponseMessage resp) throws IllegalAccessException
-	{
-		//Need to create a new SocketAddress for each client request
-		
-		Double random = Math.random();
-		System.out.println("[Server] Math Random Value is : " + String.valueOf(random));
-   
-    	 byte[] rawBuf = messageByte.array();
-         Marshal.marshalResponse(resp, messageByte);
-         DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length,this.clientSocketAddr);
-         this.cache.put(resp.id, resp);
-         if(random< this.packetLossRate)
-         {
-         try {
- 			this.socket.send(packet);	
- 			System.out.println("[Server] Successfully send response to client");
- 			messageByte.clear();
- 			
- 		} catch (IOException e) {
- 			// TODO Auto-generated catch block
- 			e.printStackTrace();
- 		}
-     }
-     else
-     {
-    	 System.out.println("[SERVER] Drop Response to Client");
-     }
-       
-			messageByte.clear();
+        messageByte.clear();
 
 
-	}
-	
-	public void broadcastToRegisteredClients(ResponseMessage resp, SocketAddress clientRegisteredAddress ) throws IllegalAccessException
-	{
+    }
+
+    public void broadcastToRegisteredClients(ResponseMessage resp, SocketAddress clientRegisteredAddress) throws IllegalAccessException {
         byte[] rawBuf = messageByte.array();
         Marshal.marshalResponse(resp, messageByte);
-       
-        DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length,clientRegisteredAddress);
+        DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length, clientRegisteredAddress);
         try {
-			this.socket.send(packet);	
-			System.out.println("[Server] Successfully send response to Registered client");
-			messageByte.clear();
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            socket.send(packet);
+            System.out.println("[Server] Successfully send response to Registered client");
+            messageByte.clear();
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
 
-	}
-	
+    }
+
 }

@@ -1,18 +1,18 @@
 package response;
 
 public class MonitorAccountStatusResponse {
-	
-	   public boolean success;
 
-	    public MonitorAccountStatusResponse() {
-	    }
+    public boolean success;
 
-	    public MonitorAccountStatusResponse(boolean success) {
-	        this.success = success;
-	    }
+    public MonitorAccountStatusResponse() {
+    }
 
-	    public String toString() {
-	        return "MonitorStatusResponse(" + this.success + ")";
-	    }
+    public MonitorAccountStatusResponse(boolean success) {
+        this.success = success;
+    }
+
+    public String toString() {
+        return "MonitorStatusResponse(" + this.success + ")";
+    }
 
 }

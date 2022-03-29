@@ -1,35 +1,36 @@
 package utils;
+
 import java.util.Scanner;
 
 
 public class ReadInputs {
-	 private static Scanner reader = new Scanner(System.in);
+    private static final Scanner reader = new Scanner(System.in);
 
-	    public static int safeReadInt() {
-	        try {
-	            return Integer.parseInt(reader.nextLine());
-	        } catch (NumberFormatException e) {
-	            System.out.println("Please input an integer number!");
-	            return safeReadInt();
-	        }
-	    }
-
-
-	    public static double safeReadDouble() {
-	        try {
-	            return Double.parseDouble(reader.nextLine());
-	        } catch (NumberFormatException e) {
-	            System.out.println("Please input a number!");
-	            return safeReadDouble();
-	        }
-	    }
+    public static int safeReadInt() {
+        try {
+            return Integer.parseInt(reader.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Please input an integer number!");
+            return safeReadInt();
+        }
+    }
 
 
-	    public static String readLine() {
-	        return reader.nextLine();
-	    }
+    public static double safeReadDouble() {
+        try {
+            return Double.parseDouble(reader.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Please input a number!");
+            return safeReadDouble();
+        }
+    }
 
-	    public static void closeReader() {
-	        reader.close();
-	    }
+
+    public static String readLine() {
+        return reader.nextLine();
+    }
+
+    public static void closeReader() {
+        reader.close();
+    }
 }

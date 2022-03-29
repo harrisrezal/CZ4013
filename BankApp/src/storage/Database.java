@@ -8,7 +8,7 @@ import java.util.HashMap;
  * value = account detail
  */
 public class Database {
-    private HashMap<Integer, AccountDetail> db = new HashMap<Integer, AccountDetail>();
+    private final HashMap<Integer, AccountDetail> db = new HashMap<Integer, AccountDetail>();
 
     /**
      * Stores a bank account record.
@@ -39,5 +39,5 @@ public class Database {
     public AccountDetail query(int accountNumber) {
         return db.get(accountNumber);
     }
-    
+
 }

@@ -18,7 +18,7 @@ public class Main {
 				+ "Please enter credentials of the server\n";
 		System.out.println(welcome);
 		String serverIP = Constants.SERVER_IP;
-		int serverPort = Constants.SERVER_PORT; 
+		int serverPort = Constants.SERVER_PORT;
 
         String menu = "----------------------------Bank Menu------------------------------------\n" +
                 "Please choose a service by typing [1-8]:\n" +
@@ -31,7 +31,7 @@ public class Main {
                 "7: Close a bank account\n" +
                 "8: Print the menu\n" +
                 "0: Stop the client\n";
-        
+
 
        ClientServices clientService = new ClientServices(new Client());
        DatagramSocket socket = new DatagramSocket(new InetSocketAddress(Constants.CLIENT_IP, Constants.CLIENT_PORT));

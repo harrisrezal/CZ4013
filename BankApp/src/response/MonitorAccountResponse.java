@@ -1,8 +1,8 @@
 package response;
 
 public class MonitorAccountResponse {
-	
-	public String info;
+
+    public String info;
 
     public MonitorAccountResponse() {
     }
