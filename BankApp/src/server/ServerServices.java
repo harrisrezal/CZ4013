@@ -159,7 +159,8 @@ public static Server server;
         //TODO allow sending to multiple socketAddress.
         this.listeners.forEach((socketAddress, x) -> {
             try {
-				this.server.broadcastToRegisteredClients(new ResponseMessage(UUID.randomUUID(),"MonitorAccount",Status.OK, new MonitorAccountResponse(info)), socketAddress);
+            	System.out.println("Sending to registered client Ip Address :" + socketAddress.toString());
+				this.server.broadcastToRegisteredClients(new ResponseMessage(UUID.randomUUID(),"MonitorInfo",Status.OK, new MonitorAccountResponse(info)), socketAddress);
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

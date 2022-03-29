@@ -61,8 +61,8 @@ public class Server {
         try {
 			this.socket.receive(packet);
 						
-			System.out.println("Client Port  " + String.valueOf(packet.getPort()));
-			System.out.println(packet.getAddress().getHostAddress());
+			System.out.println("Client Port  : " + String.valueOf(packet.getPort()));
+			System.out.println("Client Ip Address : " + packet.getAddress().getHostAddress());
 	        System.out.println(new String(packet.getData(), packet.getOffset(), packet.getLength()));
 		    this.clientSocketAddr = new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort());
 
@@ -174,6 +174,7 @@ if(atMostOnce)
 	{
         byte[] rawBuf = messageByte.array();
         Marshal.marshalResponse(resp, messageByte);
+       
         DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length,clientRegisteredAddress);
         try {
 			this.socket.send(packet);	
