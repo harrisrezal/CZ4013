@@ -55,8 +55,10 @@ public class Server {
         DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length);
         try {
             socket.receive(packet);
+            double value = Math.random();
 
-            if (Math.random() >= packetLossRate) {
+            if (value >= packetLossRate) {
+                System.out.println("Value = " + value + " || packetLossRate = " + packetLossRate);
                 System.out.println("Dropping Clients request packet on PURPOSE!!");
                 return null;
             }

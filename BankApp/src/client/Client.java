@@ -120,12 +120,12 @@ public class Client {
         byte[] rawBuf = messageByte.array();
         DatagramPacket packet = new DatagramPacket(rawBuf, rawBuf.length);
         Instant end = Instant.now().plus(interval);
-        try {
-            this.setSocketTimeOut(0);
-        } catch (SocketException e1) {
-            System.out.println("[Client] Error Setting the socketTime out.");
-            e1.printStackTrace();
-        }
+//        try {
+//            this.setSocketTimeOut(0);
+//        } catch (SocketException e1) {
+//            System.out.println("[Client] Error Setting the socketTime out.");
+//            e1.printStackTrace();
+//        }
         Thread pollingThread = new Thread(() ->
         {
             while (!Instant.now().isAfter(end)) {
@@ -153,7 +153,12 @@ public class Client {
                         messageByte.clear();
 
                     }
-                } catch (RuntimeException var9) {
+                }
+                catch (SocketTimeoutException e){
+                    System.out.println("hello world 2");
+                }
+
+                catch (RuntimeException var9) {
                     if (!(var9.getCause() instanceof SocketTimeoutException) && var9.getCause() instanceof InterruptedIOException) {
                         return;
                     }
@@ -172,12 +177,13 @@ public class Client {
         }
 
         pollingThread.interrupt();
-        try {
-            this.setSocketTimeOut(Constants.TIMEOUT_MILLISECONDS);
-        } catch (SocketException e) {
-            System.out.println("[Client] Error Setting back the socketTime out.");
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        System.out.println("Thread ended due to timeout");
+//        try {
+//            this.setSocketTimeOut(Constants.TIMEOUT_MILLISECONDS);
+//        } catch (SocketException e) {
+//            System.out.println("[Client] Error Setting back the socketTime out.");
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
     }
 }
