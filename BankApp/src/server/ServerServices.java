@@ -144,12 +144,12 @@ public class ServerServices {
         this.listeners.forEach((socketAddress, x) ->
         {
             try {
-            	System.out.println("Sending to registered client Ip Address :" + socketAddress.toString());
-				this.server.broadcastToRegisteredClients(new ResponseMessage(UUID.randomUUID(),"MonitorInfo",Status.OK, new MonitorAccountResponse(info)), socketAddress);
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+                System.out.println("Sending to registered client Ip Address :" + socketAddress.toString());
+                server.broadcastToRegisteredClients(new ResponseMessage(UUID.randomUUID(), "MonitorInfo", Status.OK, new MonitorAccountResponse(info)), socketAddress);
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         });
     }
 

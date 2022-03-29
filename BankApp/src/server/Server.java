@@ -1,27 +1,22 @@
 package server;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.util.Optional;
-import java.util.UUID;
-
 import communication.Marshal;
 import communication.UnMarshal;
 import request.RequestMessage;
 import response.ResponseMessage;
 import storage.LruCache;
-import utils.Constants;
+
+import java.io.IOException;
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.UUID;
 
 /*
- * 
- * UUID 
- * METHOD 
- * Body 
+ *
+ * UUID
+ * METHOD
+ * Body
  * */
 public class Server {
 
@@ -37,23 +32,21 @@ public class Server {
     private LruCache<UUID, ResponseMessage> cache;
     public static boolean atMostOnce;
 
-	public Server()
-	{
-		
-	}
-	public void openSocketConnection(DatagramSocket socket, LruCache<UUID, ResponseMessage> cache, boolean atMostOnce) throws SocketException
-	{
-		this.socket = socket;	
-		this.cache = cache;
-		this.atMostOnce = atMostOnce;
-      //  this.clientSocketAddr = new InetSocketAddress(Constants.CLIENT_IP, Constants.CLIENT_PORT);
-       
-	}
-	
-	public void setSocketTimeOut(int milliSeconds)  throws SocketException
-	{
-        this.socket.setSoTimeout(milliSeconds);
-	}
+    public Server() {
+
+    }
+
+    public void openSocketConnection(DatagramSocket socket, LruCache<UUID, ResponseMessage> cache, boolean atMostOnce) throws SocketException {
+        Server.socket = socket;
+        this.cache = cache;
+        Server.atMostOnce = atMostOnce;
+        //  this.clientSocketAddr = new InetSocketAddress(Constants.CLIENT_IP, Constants.CLIENT_PORT);
+
+    }
+
+    public void setSocketTimeOut(int milliSeconds) throws SocketException {
+        socket.setSoTimeout(milliSeconds);
+    }
 
 
     public RequestMessage receieveFromClient() {
@@ -73,9 +66,9 @@ public class Server {
             System.out.println(new String(packet.getData(), packet.getOffset(), packet.getLength()));
             clientSocketAddr = new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort());
 
-			RequestMessage reqReceived = UnMarshal.unMarshalRequest(messageByte);
+            RequestMessage reqReceived = UnMarshal.unMarshalRequest(messageByte);
 
-			messageByte.clear();
+            messageByte.clear();
 
             if (atMostOnce) {
                 ResponseMessage fromCache = this.cache.get(reqReceived.id);
