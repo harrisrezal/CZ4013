@@ -76,7 +76,7 @@ public class ClientServices {
     }
 
 
-    public void runDepositService(String transaction) throws IllegalAccessException {
+    public void runTransactionService(String transaction, boolean deposit) throws IllegalAccessException {
         System.out.println("Please input the following information to perform a " + transaction);
         int accountNumber = this.askAccountNumber();
         String name = this.askName();
@@ -84,8 +84,10 @@ public class ClientServices {
         Currency currency = this.askCurrency();
         Double amount = this.askAmount();
 
-
-        ResponseMessage resp = client.sendRequest("DepositAccount", new DepositAccountRequest(name, accountNumber, password, currency, -amount));
+        if (!deposit){
+            amount = -1 * amount;
+        }
+        ResponseMessage resp = client.sendRequest("DepositAccount", new DepositAccountRequest(name, accountNumber, password, currency, amount));
         if (resp != null) {
             DepositAccountResponse DepositResp = (DepositAccountResponse) resp.obj;
 

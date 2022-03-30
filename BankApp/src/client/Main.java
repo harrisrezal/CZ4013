@@ -55,10 +55,10 @@ public class Main {
                         clientService.runQueryService();
                         break;
                     case 3:
-                        clientService.runDepositService("Deposit");
+                        clientService.runTransactionService("Deposit", true);
                         break;
                     case 4:
-                        clientService.runDepositService("Withdrawal");
+                        clientService.runTransactionService("Withdrawal", false);
                         break;
                     case 5:
                         clientService.runMonitorService(Constants.CLIENT_IP, Constants.CLIENT_PORT);
