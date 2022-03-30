@@ -26,9 +26,11 @@ public class Server {
     public static DatagramSocket socket;
     public static SocketAddress clientSocketAddr;
     public static ByteBuffer messageByte = ByteBuffer.allocate(8192);
-    public static double packetLossRate = Double.parseDouble(env.getOrDefault("PACKET_LOSS_RATE", "0.0"));
-    public static String clientIpAddress;
-    public static int clientPortNumber;
+
+    // PACKET_LOSS_RATE = 0 -> All packets will be lost
+    // PACKET_LOSS_RATE = 1 -> All packets will be sent
+    public static double packetLossRate = Double.parseDouble(env.getOrDefault("PACKET_LOSS_RATE", "1.0"));
+
     private LruCache<UUID, ResponseMessage> cache;
     public static boolean atMostOnce;
 
